@@ -12,6 +12,10 @@ PKG_LONGDESC="The m4 macro processor."
 
 PKG_CONFIGURE_OPTS_HOST="gl_cv_func_gettimeofday_clobber=no --target=${TARGET_NAME}"
 
+pre_configure_host() {
+  export CFLAGS="${CFLAGS} -std=gnu17"
+}
+
 post_makeinstall_host() {
   make prefix=${SYSROOT_PREFIX}/usr install
 }

@@ -34,14 +34,14 @@ echo 7 > /proc/sys/kernel/printk
 # cd /storage/back
 # ./backapp &
 
-#系统音量调80%
+# Set system volume to 80%
 # amixer sset Playback 189
 # amixer set 'Playback' 20%
 #echo 0 > /sys/class/gpio/gpio69/value
 
 magick /usr/config/splash/splash-640.png bgra:/dev/fb0
  #magick /usr/config/splash/blank.png bgra:/dev/fb0
-  #打开amp
+  # Turn on the amp
 #echo 1 >  /sys/class/gpio/gpio117/value
 #echo 0 > /sys/class/gpio/gpio114/value
 #killall -SIGUSR1 emulationstation

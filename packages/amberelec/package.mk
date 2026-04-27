@@ -70,7 +70,7 @@ makeinstall_target() {
   ln -sf /storage/.config/distribution ${INSTALL}/distribution
   find ${INSTALL}/usr/config/distribution/ -type f -exec chmod o+x {} \;
 
-	echo "当前设备: ${DEVICE}"
+	echo "Current device: ${DEVICE}"
 	
   if [ "${DEVICE}" == "RG351P" ]; then
     cp ${INSTALL}/usr/config/distribution/configs/distribution.conf.351p ${INSTALL}/usr/config/distribution/configs/distribution.conf
@@ -114,7 +114,7 @@ makeinstall_target() {
 
   find_file_path "splash/splash-*.png" && cp ${FOUND_PATH} ${INSTALL}/usr/config/splash
   find_file_path "splash/blank.png" && cp ${FOUND_PATH} ${INSTALL}/usr/config/splash
-#  新添加
+# Newly added
   mkdir -p ${INSTALL}/usr/share/bootloader
   if [ "${DEVICE}" == "RG351P" ]; then
     find_file_path "splash/splash-480.bmp" && cp ${FOUND_PATH} ${INSTALL}//usr/share/bootloader/logo.bmp
@@ -171,17 +171,17 @@ post_install() {
   #echo -e "\033[0m" >>${INSTALL}/etc/issue
   #echo "" >>${INSTALL}/etc/issue
   
-  #在这里放入一些需要加入的补丁程序
-  #后台服务程序
+  # Drop in any extra patch programs here
+  # Background service program
   cp ${OLDPWD}/extpackage/AmberELEC-Server-C/retropixel-server ${INSTALL}/usr/bin/
-  #开机logo
+  # Boot logo
   cp ${OLDPWD}/extpackage/Pic/splash-640.png ${INSTALL}/usr/config/splash/splash-640.png
   cp ${OLDPWD}/extpackage/Pic/splash-640.png ${INSTALL}/usr/config/splash/blank.png
-  #语言配置
+  # Language config
   cp ${OLDPWD}/extpackage/AmberELEC-Config/distribution.conf ${INSTALL}/usr/config/distribution/configs/distribution.conf
-  #界面配置
+  # UI config
   cp ${OLDPWD}/extpackage/AmberELEC-Config/es_settings.cfg ${INSTALL}/usr/config/emulationstation/
-  #额外主题
+  # Extra themes
   cp -rf ${OLDPWD}/extpackage/AmberELEC-themes ${INSTALL}/usr/config/emulationstation/themes/
   
   ln -s /etc/issue ${INSTALL}/etc/motd

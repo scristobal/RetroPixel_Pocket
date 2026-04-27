@@ -2,27 +2,27 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 # Copyright (C) 2020-present Fewtarius
 
-echo "执行到scripts build_distro"
+echo "Reached scripts/build_distro"
 #bash -c 'read -n 1 -s -r'
 
-#检查ARCH参数
-echo "检查ARCH参数"
-if [ !"${ARCH}" == true ]
+# Check ARCH parameter
+echo "Checking ARCH parameter"
+if [ -z "${ARCH}" ]
 then
-  echo "export ARCH before building."
+  echo "export ARCH before building." >&2
   exit 1
 fi
 
-#声明项目设备信息
-echo "声明项目设备信息"
+# Declare project/device info
+echo "Declaring project/device info"
 #export DISTRO=AmberELEC
 export DISTRO=RetroPixel
 export PROJECT=Rockchip
 
 echo "Building ${DISTRO} for ${DEVICE}"
 
-#如果没有这个文件夹就创建这个文件夹
-echo "检查target文件夹是否存在"
+# Create the target folder if it doesn't exist
+echo "Checking whether target folder exists"
 if [ ! -d "target" ]
 then
   mkdir target
@@ -32,17 +32,17 @@ fi
 #for package in amberelec emulationstation retroarch retrorun lib32 u-boot
 #for package in linux
 
-#清理下行声明的软件包，确保构建日期和版本已更新。
+# Clean the packages declared below to ensure the build date and version are updated.
 #for package in linux
 #for package in u-boot
 #do
 #  ./scripts/clean ${package}
 #done
 
-echo "检查 ARCH 类型"
+echo "Checking ARCH type"
 if [ "${ARCH}" == "aarch64" ]
 then
-	echo "即将执行 make image"
+	echo "About to run make image"
 	#bash -c 'read -n 1 -s -r'
   make image
 elif [ "${ARCH}" == "arm" ]
@@ -73,7 +73,7 @@ then
   exit 1
 fi
 
-echo "release 文件创建"
+echo "Creating release files"
 if [ "${ARCH}" == "aarch64" ]
 then
   if [ -d "release/${ARCH}/RPPOCKET" ]

@@ -9,7 +9,7 @@
 clean_package() {
   build_msg "CLR_CLEAN" "CLEAN" "${1}" "indent"
   
-  # 新增：如果是 retroarch 包，直接返回，不执行清理
+  # Added: if this is the retroarch package, return immediately without cleaning
   #if [ "${1}" = "retroarch" ]; then
   #    return
   #fi
@@ -26,7 +26,6 @@ clean_package() {
       if [ "${STAMP_PKG_NAME}" = "${1}" ]; then
         build_msg "CLR_WARNING" "*" "$(print_color "CLR_WARNING_DIM" "Removing ${i} ...")"
         rm -rf "${i}"
-        rm -rf "${SOURCES}/${1}"
       fi
     elif [ -d "${i}" -a -f "${i}/.libreelec-package" ]; then
       # force clean if no stamp found (previous unpack failed)
@@ -47,4 +46,3 @@ if [ "${1}" = "--all" -a -n "${2}" ]; then
 elif [ -n "${1}" ]; then
   clean_package "${1}"
 fi
-

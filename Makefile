@@ -40,7 +40,7 @@ package-clean:
 # For example: make docker-RG351V will use docker to call: make RG351V
 # All variables are scoped to docker-* commands to prevent weird collisions/behavior with non-docker commands
 
-docker-%: DOCKER_IMAGE := $(shell if [ -n "${DOCKER_IMAGE}" ]; then echo `echo ${DOCKER_IMAGE} | tr '[:upper:]' '[:lower:]'`; else echo "ghcr.io/amberelec/amberelec-build"; fi)
+docker-%: DOCKER_IMAGE := $(shell if [ -n "${DOCKER_IMAGE}" ]; then echo `echo ${DOCKER_IMAGE} | tr '[:upper:]' '[:lower:]'`; else echo "retropixel-build:ubuntu20.04-20260427"; fi)
 
 # DOCKER_WORK_DIR is the directory in the Docker image - it used to be /work
 #   Anytime this directory changes, you must run `make clean` similarly to moving the AmberELEC directory
@@ -70,6 +70,13 @@ docker-%: SUDO := $(shell if which docker 2> /dev/null 1> /dev/null && ! docker 
 # Launch docker as interactive if this is an interactive shell (allows ctrl-c for manual and running non-interactive - aka: build server)
 docker-%: INTERACTIVE=$(shell [ -t 0 ] && echo "-it")
 
+# Keep Docker builds out of host-built toolchains. Host toolchain binaries may
+# require a newer glibc than the pinned container provides.
+docker-%: BUILD_SUFFIX := $(shell if [ -n "${BUILD_SUFFIX}" ]; then echo "${BUILD_SUFFIX}"; else echo "docker"; fi)
+
+# Do not inherit host-specific PATH entries from .env inside the container.
+docker-%: DOCKER_PATH := /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
 # By default pass through anything after `docker-` back into `make`
 docker-%: COMMAND=make $*
 
@@ -96,5 +103,4 @@ docker-image-push:
 
 # Wire up docker to call equivalent make files using % to match and $* to pass the value matched by %
 docker-%:
-	$(SUDO) $(DOCKER_CMD) run $(PODMAN_ARGS) $(INTERACTIVE) --init --env-file .env --rm --user $(UID):$(GID) $(DEVELOPER_SETTINGS) -v $(PWD):$(DOCKER_WORK_DIR) -v $(HOME)/.cache:$(HOME)/.cache -w $(DOCKER_WORK_DIR) $(DOCKER_IMAGE) $(COMMAND)
-
+	$(SUDO) $(DOCKER_CMD) run $(PODMAN_ARGS) $(INTERACTIVE) --init --ulimit core=0 --env-file .env --rm --user $(UID):$(GID) -e HOME=/tmp -e PATH=$(DOCKER_PATH) -e PYTHONNOUSERSITE=yes -e BUILD_SUFFIX=$(BUILD_SUFFIX) $(DEVELOPER_SETTINGS) -v $(PWD):$(DOCKER_WORK_DIR) -v $(HOME)/.cache:$(HOME)/.cache -w $(DOCKER_WORK_DIR) $(DOCKER_IMAGE) $(COMMAND)

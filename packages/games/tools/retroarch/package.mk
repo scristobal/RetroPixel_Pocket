@@ -6,7 +6,7 @@ PKG_VERSION="864ad02177e5e39c9951082e127efcc6a693b1e5"
 #PKG_SITE="https://github.com/FRetroPixel/retroarch"
 #PKG_URL="${PKG_SITE}.git"
 
-#PKG_SITE="file:///home/li/RK3326/AmberELEC/sources/retroarch/retroarch-864ad02177e5e39c9951082e127efcc6a693b1e5"
+#PKG_SITE="file://${HOME}/RK3326/AmberELEC/sources/retroarch/retroarch-864ad02177e5e39c9951082e127efcc6a693b1e5"
 PKG_SITE="file://${OLDPWD}/extpackage/retroarch-864ad02177e5e39c9951082e127efcc6a693b1e5"
 PKG_URL="${PKG_SITE}"
 
@@ -94,7 +94,7 @@ makeinstall_target() {
   #Game Boy
   #mkdir -p ${INSTALL}/usr/config/retroarch/config
   #mkdir -p ${INSTALL}/usr/config/retroarch/config/Gambatte
-  #cp /home/li/桌面/Program/AmberELEC-Retroarch-config/Gamebatte/* ${INSTALL}/usr/config/retroarch/config/Gambatte
+  #cp ${HOME}/桌面/Program/AmberELEC-Retroarch-config/Gamebatte/* ${INSTALL}/usr/config/retroarch/config/Gambatte
 }
 
 post_install() {

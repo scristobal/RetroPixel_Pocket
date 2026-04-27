@@ -1,0 +1,7 @@
+V1.1.1
+1: Reduced the probability of the uboot/kernel splash screen flashing
+2: Switched the default card in the menu to the "lastplay" tab
+3: Disabled update detection by default
+V1.1.2
+1: Disabled volume adjustment in the main UI, because there's almost no sound below 50%
+2: Fixed an issue where the first volume change was too drastic

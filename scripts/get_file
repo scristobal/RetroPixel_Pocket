@@ -4,3 +4,7 @@
 build_msg "CLR_GET" "GET" "${1} (file)" "indent"
 
 pkg_lock_status "GETPKG" "${PKG_NAME}" "unpack" "processing package file..."
+
+if [ "${VENDORED_SOURCES_ONLY}" = "yes" ] && [ ! -e "${PKG_SOURCE_NAME}" ]; then
+  die "\nMissing vendored file source for ${1}: ${PKG_SOURCE_NAME}\nExpected URL: ${PKG_URL}"
+fi

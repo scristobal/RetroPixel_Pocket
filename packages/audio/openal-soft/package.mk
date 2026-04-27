@@ -10,6 +10,14 @@ PKG_URL="https://github.com/kcat/openal-soft/archive/${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_TARGET="toolchain alsa-lib openal-soft:host"
 PKG_LONGDESC="OpenAL the Open Audio Library"
 
+post_patch() {
+  sed -i '/#include <bitset>/a #include <cstdint>' ${PKG_BUILD}/alc/alu.h
+  sed -i '/#include <array>/a #include <cstdint>' \
+    ${PKG_BUILD}/core/mixer/defs.h \
+    ${PKG_BUILD}/core/uhjfilter.h
+  sed -i '/#include <atomic>/a #include <cstdint>' ${PKG_BUILD}/al/buffer.h
+}
+
 configure_package() {
   PKG_CMAKE_OPTS_HOST="-DALSOFT_BACKEND_OSS=off \
                        -DALSOFT_BACKEND_WAVE=off \

@@ -15,8 +15,12 @@ PKG_LONGDESC="A library is a free software emulation of curses in System V Relea
 PKG_BUILD_FLAGS="+pic"
 PKG_TOOLCHAIN="auto"
 
+pre_configure_host() {
+   export CFLAGS="${CFLAGS} -std=gnu17"
+}
+
 pre_configure_target() {
-   export CFLAGS="${CFLAGS} -fcommon -fPIC"
+   export CFLAGS="${CFLAGS} -std=gnu17 -fcommon -fPIC"
 }
 
 PKG_CONFIGURE_OPTS_TARGET="

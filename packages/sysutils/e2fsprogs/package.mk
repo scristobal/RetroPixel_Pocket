@@ -18,6 +18,10 @@ if [ "${HFSTOOLS}" = "yes" ]; then
   PKG_DEPENDS_TARGET="${PKG_DEPENDS_TARGET} diskdev_cmds"
 fi
 
+pre_configure_host() {
+  export CFLAGS="${CFLAGS} -std=gnu17"
+}
+
 PKG_CONFIGURE_OPTS_HOST="--prefix=${TOOLCHAIN}/ \
                          --bindir=${TOOLCHAIN}/bin \
                          --with-udev-rules-dir=no \

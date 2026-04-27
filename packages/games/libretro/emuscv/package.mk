@@ -9,7 +9,7 @@ PKG_URL="${PKG_SITE}.git"
 PKG_DEPENDS_TARGET="toolchain"
 PKG_LONGDESC="An EPOCH/YENO Super Cassette Vision (1984) home video game emulator for Libretro"
 PKG_TOOLCHAIN="make"
-#PKG_SITE="file:///home/li/RK3326/AmberELEC/sources/emuscv/emuscv-dfce10df090ce3f5eb23bdbee289702ec1478246"
+#PKG_SITE="file://${HOME}/RK3326/AmberELEC/sources/emuscv/emuscv-dfce10df090ce3f5eb23bdbee289702ec1478246"
 #PKG_URL="${PKG_SITE}"
 PKG_MAKE_OPTS_TARGET="-C . platform=unix"
 

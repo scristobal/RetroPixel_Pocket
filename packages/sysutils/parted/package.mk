@@ -20,6 +20,10 @@ PKG_CONFIGURE_OPTS_TARGET="--disable-device-mapper \
 
 PKG_CONFIGURE_OPTS_HOST="${PKG_CONFIGURE_OPTS_TARGET}"
 
+post_patch() {
+  sed -i -e 's/^do_version ()$/do_version (PedDevice **dev, PedDisk **diskp)/' ${PKG_BUILD}/parted/parted.c
+}
+
 configure_init() {
   : # reuse configure_target()
 }

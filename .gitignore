@@ -12,6 +12,15 @@
 /sources/
 /.stamps/
 
+# local tool/runtime state and manually collected images
+/.codex
+/.config/
+/images/
+
+# external source package (downloaded manually, not committed)
+/extpackage/
+/extpackage.tar.gz
+
 # prebuild target binarys to provide
 /target/
 

@@ -1,0 +1,72 @@
+#!/bin/bash
+
+# Generate a source provenance manifest for the configured build target.
+# This script does not download anything.
+
+set -eo pipefail
+
+ROOT="$(pwd)"
+DISTRO="${DISTRO:-RetroPixel}"
+PROJECT="${PROJECT:-Rockchip}"
+DEVICE="${DEVICE:-RPPOCKET}"
+ARCH="${ARCH:-aarch64}"
+
+printf 'package\tversion\thandler\tstatus\tlocal_path\tdeclared_sha256\tlocal_sha256\turl\tsite\n'
+
+mapfile -t packages < <(
+  find packages projects -type f -name package.mk -print0 |
+    xargs -0 awk -F= '/^PKG_NAME=/ { gsub(/"/, "", $2); print $2 }' |
+    sort -u
+)
+
+for package in "${packages[@]}"; do
+  (
+    export DISTRO PROJECT DEVICE ARCH
+    # shellcheck disable=SC1091
+    . config/options "${package}" >/dev/null 2>&1 || exit 0
+
+    [ -n "${PKG_URL:-}" ] || exit 0
+    [ -n "${PKG_SOURCE_NAME:-}" ] || exit 0
+
+    case "${PKG_URL}" in
+      git://*|*.git)
+        handler="git"
+        local_path="${SOURCES}/${package}/${PKG_SOURCE_NAME}"
+        ;;
+      file://*)
+        handler="file"
+        local_path="${PKG_SOURCE_NAME}"
+        ;;
+      *)
+        handler="archive"
+        local_path="${SOURCES}/${package}/${PKG_SOURCE_NAME}"
+        ;;
+    esac
+
+    display_path="${local_path#${ROOT}/}"
+
+    if [ -e "${local_path}" ]; then
+      status="present"
+    else
+      status="missing"
+    fi
+
+    local_sha256=""
+    if [ -f "${local_path}" ]; then
+      local_sha256="$(sha256sum "${local_path}" | awk '{print $1}')"
+    elif [ -f "${local_path}.sha256" ]; then
+      local_sha256="$(cat "${local_path}.sha256")"
+    fi
+
+    printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n' \
+      "${PKG_NAME}" \
+      "${PKG_VERSION:-}" \
+      "${handler}" \
+      "${status}" \
+      "${display_path}" \
+      "${PKG_SHA256:-}" \
+      "${local_sha256}" \
+      "${PKG_URL:-}" \
+      "${PKG_SITE:--}"
+  ) || true
+done

@@ -19,7 +19,7 @@ makeinstall_target() {
     #cp -rf * ${INSTALL}/usr/config/emulationstation/themes/${PKG_NAME}
     
    
-		#cd /home/li/RK3326/AmberELEC/distributions/AmberELEC/theme
+		#cd ${HOME}/RK3326/AmberELEC/distributions/AmberELEC/theme
    #cp -rf * ${INSTALL}/usr/config/emulationstation/themes/
    #cp -rf * ${INSTALL}/usr/config/emulationstation/themes/
    

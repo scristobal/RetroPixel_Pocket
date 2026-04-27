@@ -10,11 +10,26 @@ PKG_DEPENDS_TARGET="toolchain SDL2 boost openal-soft ${OPENGLES} zlib"
 PKG_LONGDESC="Yabause is a Sega Saturn emulator and took over as Yaba Sanshiro"
 PKG_TOOLCHAIN="cmake-make"
 PKG_GIT_CLONE_BRANCH="pi4-1-9-0"
+PKG_TAR_COPY_OPTS="--exclude=.git --exclude=.svn --exclude=.libreelec-unpack --exclude=.libreelec-package"
 
 PKG_PATCH_DIRS="${DEVICE}"
 
+unpack() {
+  mkdir -p "${PKG_BUILD}"
+  tar cf - -C "${PKG_SOURCE_NAME}" ${PKG_TAR_COPY_OPTS} . | tar xf - -C "${PKG_BUILD}"
+}
+
 pre_patch() {
-  find $(echo "${PKG_BUILD}" | cut -f1 -d\ ) -type f -exec dos2unix -q {} \;
+  find "$(echo "${PKG_BUILD}" | cut -f1 -d\ )" -type f -exec perl -0pi -e 's/\r\n/\n/g' {} +
+}
+
+post_patch() {
+  sed -i -e '/project(yabause)/a include_directories(${CMAKE_CURRENT_SOURCE_DIR})' \
+    -e '/project(yabause)/a set(YABAUSE_LIBRARIES ${YABAUSE_LIBRARIES} EGL GLESv2)' \
+    -e '/project(yabause)/a set(yabause_SOURCES ${yabause_SOURCES} yglcache.c ygles.c yglshaderes.c)' \
+    -e '/project(yabause)/a add_definitions(-DHAVE_LIBGL=1 -D_OGLES3_=1 -DYAB_ASYNC_RENDERING -DYAB_PORT_OSD)' \
+    -e '/add_definitions(-DIMPROVED_SAVESTATES)/a set(yabause_SOURCES ${yabause_SOURCES} yglcache.c ygles.c yglshaderes.c nanovg/nanovg_osdcore.c)' \
+    "${PKG_BUILD}/yabause/src/CMakeLists.txt"
 }
 
 post_unpack() {
@@ -37,8 +52,14 @@ PKG_CMAKE_OPTS_TARGET="${PKG_BUILD}/yabause \
                          -DCMAKE_TOOLCHAIN_FILE=${PKG_BUILD}/yabause/src/retro_arena/n2.cmake \
                          -DYAB_WANT_VULKAN=OFF \
                          -DOPENGL_INCLUDE_DIR=${SYSROOT_PREFIX}/usr/include \
-                         -DOPENGL_opengl_LIBRARY=${SYSROOT_PREFIX}/usr/lib \
-                         -DOPENGL_glx_LIBRARY=${SYSROOT_PREFIX}/usr/lib \
+                         -DOPENGL_egl_LIBRARY=${SYSROOT_PREFIX}/usr/lib/libEGL.so \
+                         -DOPENGL_gles2_LIBRARY=${SYSROOT_PREFIX}/usr/lib/libGLESv2.so \
+                         -DOPENGL_gl_LIBRARY=OPENGL_gl_LIBRARY-NOTFOUND \
+                         -DOPENGL_glu_LIBRARY=OPENGL_glu_LIBRARY-NOTFOUND \
+                         -DOPENGL_glx_LIBRARY=OPENGL_glx_LIBRARY-NOTFOUND \
+                         -DGLUT_INCLUDE_DIR=GLUT_INCLUDE_DIR-NOTFOUND \
+                         -DGLUT_glut_LIBRARY=GLUT_glut_LIBRARY-NOTFOUND \
+                         -DXRANDR_LIBRARY=XRANDR_LIBRARY-NOTFOUND \
                          -DLIBPNG_LIB_DIR=${SYSROOT_PREFIX}/usr/lib \
                          -Dpng_STATIC_LIBRARIES=${SYSROOT_PREFIX}/usr/lib/libpng16.a \
                          -DCMAKE_BUILD_TYPE=Release \

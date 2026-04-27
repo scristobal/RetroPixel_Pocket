@@ -14,7 +14,11 @@ PKG_LONGDESC="ECWolf is a port of the Wolfenstein 3D engine based of Wolf4SDL. I
 PKG_TOOLCHAIN="cmake-make"
 
 pre_patch() {
-  find $(echo "${PKG_BUILD}" | cut -f1 -d\ ) -type f -exec dos2unix -q {} \;
+  find "$(echo "${PKG_BUILD}" | cut -f1 -d\ )" -type f -exec perl -0pi -e 's/\r\n/\n/g' {} +
+}
+
+post_patch() {
+  sed -i -e 's/void Swap(const Self &other)/void Swap(Self \&other)/' ${PKG_BUILD}/src/tmemory.h
 }
 
 pre_build_host() {

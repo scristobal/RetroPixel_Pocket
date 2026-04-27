@@ -13,12 +13,18 @@ PKG_DEPENDS_HOST="toolchain zmusic:host libwebp:host"
 PKG_DEPENDS_TARGET="toolchain SDL2 raze:host zmusic libvpx libwebp"
 PKG_LONGDESC="Raze is a fork of Build engine games backed by GZDoom tech and combines Duke Nukem 3D, Blood, Redneck Rampage, Shadow Warrior and Exhumed/Powerslave in a single package."
 PKG_TOOLCHAIN="cmake-make"
+PKG_TAR_COPY_OPTS="--exclude=.git --exclude=.svn --exclude=.libreelec-unpack --exclude=.libreelec-package"
 
 #wlz
 if [ ! "${DEVICE}" = "RG351MP" ] && [ ! "${DEVICE}" = "RG552" ] && [ ! "${DEVICE}" = "RPPOCKET" ]
 then
   PKG_PATCH_DIRS="RG351P"
 fi
+
+unpack() {
+  mkdir -p "${PKG_BUILD}"
+  tar cf - -C "${PKG_SOURCE_NAME}" ${PKG_TAR_COPY_OPTS} . | tar xf - -C "${PKG_BUILD}"
+}
 
 pre_build_host() {
   HOST_CMAKE_OPTS=""
@@ -34,23 +40,25 @@ makeinstall_host() {
 }
 
 pre_configure_host(){
-PKG_CMAKE_OPTS_HOST=" -DZMUSIC_LIBRARIES=$(get_build_dir zmusic)/build_host/source/libzmusic.so \
-                      -DZMUSIC_INCLUDE_DIR=$(get_build_dir zmusic)/include \
-                      -DCMAKE_BUILD_TYPE=Release \
-                      -DCMAKE_RULE_MESSAGES=OFF \
-                      -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON"
+  export CFLAGS="${CFLAGS} -std=gnu17"
+  PKG_CMAKE_OPTS_HOST=" -DZMUSIC_LIBRARIES=$(get_build_dir zmusic)/build_host/source/libzmusic.so \
+                        -DZMUSIC_INCLUDE_DIR=$(get_build_dir zmusic)/include \
+                        -DCMAKE_BUILD_TYPE=Release \
+                        -DCMAKE_RULE_MESSAGES=OFF \
+                        -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON"
 }
 
 pre_configure_target() {
-PKG_CMAKE_OPTS_TARGET=" -DNO_GTK=ON \
-                        -DFORCE_CROSSCOMPILE=ON \
-                        -DIMPORT_EXECUTABLES=${PKG_BUILD}/.${HOST_NAME}/ImportExecutables.cmake \
-                        -DCMAKE_BUILD_TYPE=Release \
-                        -DCMAKE_RULE_MESSAGES=OFF \
-                        -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON \
-                        -DHAVE_GLES2=ON \
-                        -DHAVE_VULKAN=OFF \
-                        -DZMUSIC_LIBRARIES=$(get_build_dir zmusic)/build_target/source/libzmusic.so -DZMUSIC_INCLUDE_DIR=$(get_build_dir zmusic)/include"
+  export CFLAGS="${CFLAGS} -std=gnu17"
+  PKG_CMAKE_OPTS_TARGET=" -DNO_GTK=ON \
+                          -DFORCE_CROSSCOMPILE=ON \
+                          -DIMPORT_EXECUTABLES=${PKG_BUILD}/.${HOST_NAME}/ImportExecutables.cmake \
+                          -DCMAKE_BUILD_TYPE=Release \
+                          -DCMAKE_RULE_MESSAGES=OFF \
+                          -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON \
+                          -DHAVE_GLES2=ON \
+                          -DHAVE_VULKAN=OFF \
+                          -DZMUSIC_LIBRARIES=$(get_build_dir zmusic)/build_target/source/libzmusic.so -DZMUSIC_INCLUDE_DIR=$(get_build_dir zmusic)/include"
 }
 
 makeinstall_target() {

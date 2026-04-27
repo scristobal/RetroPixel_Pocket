@@ -16,6 +16,21 @@ PKG_CONFIGURE_OPTS_TARGET="--with-curses \
                            --without-bash-malloc \
                            --with-installed-readline"
 
+pre_configure_target() {
+  export CFLAGS_FOR_BUILD="${HOST_CFLAGS} -std=gnu17"
+}
+
+post_configure_target() {
+  sed -i \
+    -e "s|^READLINE_LIB = .*|READLINE_LIB = ${SYSROOT_PREFIX}/usr/lib/libreadline.a|" \
+    -e "s|^READLINE_LDFLAGS = .*|READLINE_LDFLAGS =|" \
+    -e "s|^HISTORY_LIB = .*|HISTORY_LIB = ${SYSROOT_PREFIX}/usr/lib/libhistory.a|" \
+    -e "s|^HISTORY_LDFLAGS = .*|HISTORY_LDFLAGS =|" \
+    -e "s|^TERMCAP_LIB = .*|TERMCAP_LIB = ${SYSROOT_PREFIX}/usr/lib/libtinfo.a|" \
+    -e "s|^TERMCAP_LDFLAGS = .*|TERMCAP_LDFLAGS =|" \
+    Makefile
+}
+
 post_install() {
   ln -sf bash ${INSTALL}/usr/bin/sh
   mkdir -p ${INSTALL}/etc

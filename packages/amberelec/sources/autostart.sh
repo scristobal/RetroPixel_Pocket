@@ -195,7 +195,7 @@ then
   BRIGHTNESS=3
 fi
 BRIGHTNESS=$(printf "%.0f" ${BRIGHTNESS})
-#屏蔽以前背光
+# Disable the old backlight handling
 #echo ${BRIGHTNESS} > /sys/class/backlight/backlight/brightness
 #set_ee_setting system.brightness ${BRIGHTNESS}
 

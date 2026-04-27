@@ -29,7 +29,7 @@ if [[ "${DEVICE}" =~ RG351 ]]; then
 # PKG_URL="https://github.com/rtosmos/uboot_rg351.git"
 #  PKG_URL="https://github.com/AmberELEC/uboot_rg351.git"
   
-#  PKG_URL="file:///home/li/RK3326/AmberELEC/sources/u-boot/u-boot-d8ad98256d4913bf39153a404f5e26e94cfe8b14"
+#  PKG_URL="file://${HOME}/RK3326/AmberELEC/sources/u-boot/u-boot-d8ad98256d4913bf39153a404f5e26e94cfe8b14"
 #  PKG_SITE="${PKG_URL}"
 #   PKG_URL="https://github.com/rtosmos/rk-u-boot.git"
 elif [[ "${DEVICE}" =~ RG552 ]]; then

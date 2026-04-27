@@ -8,7 +8,7 @@
 # Copyright (C) 2018-present Team CoreELEC (https://coreelec.org)
 
 # create directories
-#创建游戏系统所需要的挂载点
+# Create the mount points required by the game system
 /usr/bin/busybox mkdir -p /dev
 /usr/bin/busybox mkdir -p /proc
 /usr/bin/busybox mkdir -p /sys
@@ -29,7 +29,7 @@
 /usr/bin/busybox mount -t tmpfs tmpfs /li
 
 # set needed variables
-# 设定需要的变量
+# Set the required variables
 MODULE_DIR=/usr/lib/modules
 
 UPDATE_ROOT=/storage/.update

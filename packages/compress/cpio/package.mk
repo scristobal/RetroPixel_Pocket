@@ -9,3 +9,9 @@ PKG_SITE="http://www.gnu.org/software/cpio/"
 PKG_URL="http://ftpmirror.gnu.org/cpio/${PKG_NAME}-${PKG_VERSION}.tar.gz"
 PKG_DEPENDS_HOST="toolchain"
 PKG_LONGDESC="A program to manage archives of files."
+
+post_patch() {
+  sed -i -e 's/int (\*xstat) ();/int (*xstat) (const char *restrict file, struct stat *restrict st);/' \
+    ${PKG_BUILD}/src/extern.h \
+    ${PKG_BUILD}/src/global.c
+}

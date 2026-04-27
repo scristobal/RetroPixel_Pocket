@@ -36,10 +36,18 @@ _get_repo_clean() {
 # Latest file already present, exit now...
 _get_repo_already_downloaded && exit 0
 
+if [ "${VENDORED_SOURCES_ONLY}" = "yes" ]; then
+  die "\nMissing or invalid vendored git source for ${1}: ${PACKAGE}\nExpected URL: ${PKG_URL}\nExpected commit: ${PKG_VERSION}\nVENDORED_SOURCES_ONLY=yes forbids git clone/pull/submodule network operations."
+fi
+
 lock_source_dir "${1}"
 
 # Check again in case of concurrent access - if nothing needs to be downloaded, exit now...
 _get_repo_already_downloaded && exit 0
+
+if [ "${VENDORED_SOURCES_ONLY}" = "yes" ]; then
+  die "\nMissing or invalid vendored git source for ${1}: ${PACKAGE}\nExpected URL: ${PKG_URL}\nExpected commit: ${PKG_VERSION}\nVENDORED_SOURCES_ONLY=yes forbids git clone/pull/submodule network operations."
+fi
 
 # At this point, we need to download something...
 build_msg "CLR_GET" "GET" "${1} (git)" "indent"

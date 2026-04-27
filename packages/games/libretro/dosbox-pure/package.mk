@@ -12,7 +12,7 @@ PKG_LONGDESC="A port of DOSBox to libretro"
 PKG_TOOLCHAIN="make"
 
 pre_patch() {
-  find $(echo "${PKG_BUILD}" | cut -f1 -d\ ) -type f -exec dos2unix -q {} \;
+  find "$(echo "${PKG_BUILD}" | cut -f1 -d\ )" -type f -exec perl -0pi -e 's/\r\n/\n/g' {} +
 }
 
 make_target() {

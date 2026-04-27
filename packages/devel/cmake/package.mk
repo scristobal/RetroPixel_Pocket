@@ -13,6 +13,10 @@ PKG_LONGDESC="A cross-platform, open-source make system."
 PKG_TOOLCHAIN="configure"
 PKG_BUILD_FLAGS="+local-cc"
 
+post_patch() {
+  sed -i -e '/#include <memory>/a #include <cstdint>' ${PKG_BUILD}/Utilities/cmcppdap/include/dap/network.h
+}
+
 configure_host() {
   ../configure --prefix=${TOOLCHAIN} \
                --no-qt-gui --no-system-libs \

@@ -8,9 +8,10 @@ PKG_SHA256="cccfcc407b20d343fb320d4a9a2110776dd3165118ffd41f4b1b162340333f94"
 PKG_LICENSE="GPL"
 PKG_SITE="http://www.gnu.org/software/gdb/"
 PKG_URL="http://ftpmirror.gnu.org/gdb/${PKG_NAME}-${PKG_VERSION}.tar.xz"
-PKG_DEPENDS_TARGET="toolchain zlib ncurses expat"
+PKG_DEPENDS_TARGET="toolchain zlib ncurses expat gmp"
 PKG_LONGDESC="GNU Project debugger, allows you to see what is going on inside another program while it executes."
 # gdb could fail on runtime if build with LTO support
+PKG_TOOLCHAIN="configure"
 
 PKG_CONFIGURE_OPTS_TARGET="bash_cv_have_mbstate_t=set \
                            --disable-shared \
@@ -22,6 +23,8 @@ PKG_CONFIGURE_OPTS_TARGET="bash_cv_have_mbstate_t=set \
 			   --with-intel-pt=no \
 			   --with-babeltrace=no \
 			   --with-expat=yes \
+			   --with-libexpat-prefix=${SYSROOT_PREFIX}/usr \
+			   --with-libgmp-prefix=${SYSROOT_PREFIX}/usr \
 			   --disable-source-highlight \
                            --disable-nls \
                            --disable-sim \
@@ -36,6 +39,7 @@ PKG_CONFIGURE_OPTS_TARGET="bash_cv_have_mbstate_t=set \
                            --disable-werror"
 
 pre_configure_target() {
+  find "${PKG_BUILD}" -name config.cache -delete
   CC_FOR_BUILD="${HOST_CC}"
   CFLAGS_FOR_BUILD="${HOST_CFLAGS}"
 }

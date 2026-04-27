@@ -1,5 +1,2 @@
-build.*
-sources
-release
-.ccache*
-.git
+**
+!Dockerfile

@@ -14,6 +14,9 @@ PKG_TOOLCHAIN="autotools"
 PKG_BUILD_FLAGS="-parallel"
 
 PKG_CONFIGURE_OPTS_HOST="ac_cv_prog_COMPILE_ET=no \
+                         ac_cv_header_keyutils_h=no \
+                         ac_cv_funclib_add_key=no \
+                         ac_cv_func_keyctl_get_persistent=no \
                          --enable-static --disable-shared \
                          --without-openldap \
                          --without-capng \
@@ -25,8 +28,13 @@ PKG_CONFIGURE_OPTS_HOST="ac_cv_prog_COMPILE_ET=no \
                          --without-libedit \
                          --without-hesiod \
                          --without-x \
+                         --disable-afs-string-to-key \
                          --disable-otp \
                          --disable-heimdal-documentation"
+
+pre_configure_host() {
+  find "${PKG_BUILD}" -name config.cache -delete
+}
 
 makeinstall_host() {
   mkdir -p ${TOOLCHAIN}/bin

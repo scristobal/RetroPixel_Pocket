@@ -5,56 +5,56 @@
 # Copyright (C) 2016-2018 Team LibreELEC (https://libreelec.tv)
 # Copyright (C) 2018-present Team CoreELEC (https://coreelec.org)
 
-echo "执行到scripts image"
+echo "Reached scripts/image"
 #bash -c 'read -n 1 -s -r'
 
 
 
-#清除（删除）当前环境中定义的这四个变量，释放它们占用的内存并取消其在脚本中的作用
+# Unset these four variables in the current environment, freeing their memory and removing them from the script's scope.
 unset _CACHE_PACKAGE_LOCAL _CACHE_PACKAGE_GLOBAL _DEBUG_DEPENDS_LIST _DEBUG_PACKAGE_LIST
 
-#倒入编译参数
+# Source build options
 . config/options ""
 
-#配置多线程
+# Configure multithreading
 . config/multithread
 
-#打印编译环境
+# Print the build environment
 . config/show_config
 
 
 
-echo "执行到scripts image show_config"
+echo "Reached scripts/image: show_config"
 #bash -c 'read -n 1 -s -r'
 show_config
 
-echo "执行到scripts image 环境检查与初始化工具"
+echo "Reached scripts/image: environment check & init tool"
 #bash -c 'read -n 1 -s -r'
-#项目构建前的 “环境检查与初始化工具”
+# Pre-build "environment check & init tool"
 ${SCRIPTS}/checkdeps
 
 
 
 # Setup both toolchain cmake configs to avoid potentially racy behaviour later.
 # Use a fork for host to isolate any variable modifications.
-#配置工具链 cmake 配置，以避免以后可能出现的竞态条件行为
-#使用 fork 作为主机分支，以隔离任何变量修改。
-#配置编译工具链的函数调用，分别针对 “主机（host）” 和 “目标机（target）” 环境
-#先初始化主机工具链，确保编译过程中需要的辅助工具能在当前电脑上正常编译和运行；
-#再初始化目标工具链，确保最终生成的程序能在目标设备上运行。
-echo "执行到scripts image 始化工具链"
+# Configure the toolchain cmake config to avoid potential race conditions later.
+# Use a fork for the host branch to isolate any variable modifications.
+# Toolchain setup functions are called for both the "host" and "target" environments.
+# First initialise the host toolchain, ensuring the helper tools needed during the build can compile and run on this machine.
+# Then initialise the target toolchain, ensuring the final binaries can run on the target device.
+echo "Reached scripts/image: initialise toolchains"
 #bash -c 'read -n 1 -s -r'
 ( setup_toolchain host )
 setup_toolchain target
 
 
 
-echo "执行到scripts image 宏定义传递"
+echo "Reached scripts/image: macro/variable passthrough"
 #bash -c 'read -n 1 -s -r'
-#mkimage前的宏定义传递
+# Pass variables through to mkimage
 function do_mkimage() {
   # Variables used in mkimage script must be passed
-  # mkimage 脚本中使用的变量必须传递
+  # Variables used in the mkimage script must be forwarded
   env \
     ROOT="${ROOT}" \
     SCRIPTS="${SCRIPTS}" \
@@ -84,18 +84,18 @@ function do_mkimage() {
     ${SCRIPTS}/mkimage
 }
 
-echo "执行到scripts image 标记当前构建版本对应的 Git 提交记录"
+echo "Reached scripts/image: tag current build with its Git commit"
 #bash -c 'read -n 1 -s -r'
-#标记当前构建版本对应的 Git 提交记录（方便追溯版本来源）
+# Tag the current build with the corresponding Git commit (for version traceability)
 if [ -n "${CUSTOM_GIT_HASH}" ]; then
   GIT_HASH="${CUSTOM_GIT_HASH}"
 else
   GIT_HASH=$(git rev-parse HEAD)
 fi
 
-echo "执行到scripts image 生成 LIBREELEC_VERSION 版本号"
+echo "Reached scripts/image: generate LIBREELEC_VERSION"
 #bash -c 'read -n 1 -s -r'
-#根据构建类型（如 nightly、daily 等）动态生成 LIBREELEC_VERSION 版本号
+# Dynamically generate LIBREELEC_VERSION based on the build type (nightly, daily, etc.)
 if [ "${LIBREELEC_VERSION}" = "devel" ]; then
   GIT_ABBREV=${GIT_HASH:0:7}
   DEVEL_VERSION=${LIBREELEC_VERSION}
@@ -109,12 +109,12 @@ if [ "${LIBREELEC_VERSION}" = "devel" ]; then
 fi
 
 # Get origin url, fix git:// and git@github.com: urls if necessary
-#获取源 URL，必要时修复 git:// 和 git@github.com: URL。
-echo "执行到scripts image 获取源 URL"
+# Get the origin URL, fixing git:// and git@github.com: URLs if needed.
+echo "Reached scripts/image: get origin URL"
 ORIGIN_URL="$(git remote -v | awk '$1 == "origin" { print $2 }' | head -1 | sed 's#\.git$##;s#^git:#https:#;s#^git@github\.com:#https://github.com/#')"
 
-#编译代号有关
-echo "执行到scripts image 编译代号"
+# Build codename
+echo "Reached scripts/image: build codename"
 [ "${BUILDER_NAME,,}" = "official" ] && BUILDER_NAME=
 if [ "${OFFICIAL}" = "yes" ]; then
   LIBREELEC_BUILD=$(echo `echo VDJabWFXTnBZV3dnTFNCQmJXSmxja1ZNUlVNZ1NWTWdSbEpGUlNCQlRrUWdUazlVSUVaUFVpQlRRVXhGSVE9PQ== | base64 --decode` | base64 --decode)
@@ -126,18 +126,18 @@ else
   fi
 fi
 
-#判断是否为自定义版本
+# Check whether a custom version is set
 if [ -n "${CUSTOM_VERSION}" ]; then
   export LIBREELEC_VERSION="${CUSTOM_VERSION}"
 fi
 
-#计算版本信息
-echo "执行到scripts image 计算版本信息"
+# Compute version info
+echo "Reached scripts/image: compute version info"
 LIBREELEC_ARCH="${DEVICE:-${PROJECT}}.${TARGET_ARCH}"
 TARGET_VERSION="${LIBREELEC_ARCH}-${LIBREELEC_VERSION}"
 
-#动态生成镜像文件的名称（IMAGE_NAME）
-echo "执行到scripts image 动态生成镜像文件的名称"
+# Dynamically generate the image file name (IMAGE_NAME)
+echo "Reached scripts/image: generate image file name"
 if [ -n "${CUSTOM_IMAGE_NAME}" ]; then
   IMAGE_NAME="${CUSTOM_IMAGE_NAME}"
 else
@@ -152,74 +152,74 @@ else
   fi
 fi
 
-#镜像名称
+# Image name
 if [ -n "${IMAGE_SUFFIX}" ]; then
   IMAGE_NAME="${IMAGE_NAME}-${IMAGE_SUFFIX}"
 fi
 
-#命名
+# Write the name
 echo "${IMAGE_NAME}" > ${BUILD}/BUILD_FILENAME
 
 # Setup fakeroot
-echo "执行到scripts image Setup fakeroot"
+echo "Reached scripts/image: Setup fakeroot"
 rm -rf ${FAKEROOT_SCRIPT}   # remove ${FAKEROOT_SCRIPT} if it exist
 touch ${FAKEROOT_SCRIPT}    # create an empty ${FAKEROOT_SCRIPT}
 chmod +x ${FAKEROOT_SCRIPT} # make ${FAKEROOT_SCRIPT} executable
 echo "chown -R 0:0 ${INSTALL}" >> ${FAKEROOT_SCRIPT}
 
 # Clean old install dirs
-# 清除旧的安装文件
-echo "执行到scripts image 清除旧的安装文件"
+# Remove old install files
+echo "Reached scripts/image: remove old install files"
 rm -rf ${INSTALL}
 rm -rf ${STAMPS_INSTALL}
 mkdir -p ${INSTALL}
 
 # Create base layout of LibreELEC read-only file system
-# 创建基本的只读文件系统布局
-echo "执行到scripts image 创建基本的只读文件系统布局"
+# Create the base read-only filesystem layout
+echo "Reached scripts/image: create base read-only filesystem layout"
 for directory in etc dev proc run sys tmp usr var flash storage; do
   mkdir -p ${INSTALL}/${directory}
 done
 
 # Build image contents
-# 编译镜像内容
-echo "执行到scripts image 编译镜像内容"
-# 打印当前所有环境变量
+# Build the image contents
+echo "Reached scripts/image: build image contents"
+# Print all current environment variables
 echo "======================================"
-echo "          环境变量开始打印           "
+echo "       Begin environment variables    "
 echo "======================================"
 env
 echo "======================================"
-echo "          环境变量打印结束           "
+echo "        End environment variables     "
 echo "======================================"
 
 #bash -c 'read -n 1 -s -r'
 MTADDONBUILD=no start_multithread_build image || die "Parallel build failure - see log for details. Time of failure: $(date)"
 
 
-# 编译完毕 制作镜像根目录
-echo "执行到scripts image 制作镜像根目录"
+# Build complete - assemble the image root directory
+echo "Reached scripts/image: assemble image root directory"
 #bash -c 'read -n 1 -s -r'
 echo "Successful build!  Building image root..." >&2
 
 # Create legacy sym links
-# 创建快捷方式
+# Create symlink shortcuts
 ln -sfn /var/media ${INSTALL}/media
 ln -sfn /usr/lib ${INSTALL}/lib
 ln -sfn /usr/bin ${INSTALL}/bin
 ln -sfn /usr/sbin ${INSTALL}/sbin
 
-# 是否为x86机器而链接86库
+# If this is an x86 machine, link the x86 libs
 if [ "${TARGET_ARCH}" = "x86_64" ]; then
   ln -sfn /usr/lib ${INSTALL}/lib64
   ln -sfn /usr/lib ${INSTALL}/usr/lib64
 fi
 
-# 输出项目版本
+# Write the project version
 echo "${TARGET_VERSION}" > ${INSTALL}/etc/release
 
 # Create /etc/os-release
-# 创建系统版本
+# Create the OS version file
 cat <<EOF >${INSTALL}/etc/os-release
 NAME="${DISTRONAME}"
 VERSION="${LIBREELEC_VERSION}"
@@ -242,7 +242,7 @@ EOF
 [ -n "${BUILDER_VERSION}" ] && echo "BUILDER_VERSION=\"${BUILDER_VERSION}\"" >> ${INSTALL}/etc/os-release
 
 # Add release notes / changelog
-# 增加发行版本笔记
+# Add release notes
 if [ -n "${RELEASE_NOTES}" ] && [ -f "${RELEASE_NOTES}" ]; then
   cp "${RELEASE_NOTES}" ${INSTALL}/etc/release-notes
 else
@@ -250,7 +250,7 @@ else
 fi
 
 # Copy PROJECT related files to filesystem
-# 复制项目有关的文件到文件系统
+# Copy project-related files into the filesystem
 if [ -d "${PROJECT_DIR}/${PROJECT}/filesystem" ]; then
   cp -PR ${PROJECT_DIR}/${PROJECT}/filesystem/* ${INSTALL}
   # Install project specific systemd services
@@ -262,7 +262,7 @@ if [ -d "${PROJECT_DIR}/${PROJECT}/filesystem" ]; then
 fi
 
 # Copy DEVICE related files to filesystem
-# 复制设备有关的文件到文件系统
+# Copy device-related files into the filesystem
 if [ -n "${DEVICE}" -a -d "${PROJECT_DIR}/${PROJECT}/devices/${DEVICE}/filesystem" ]; then
   cp -PR ${PROJECT_DIR}/${PROJECT}/devices/${DEVICE}/filesystem/* ${INSTALL}
   # Install device specific systemd services
@@ -274,7 +274,7 @@ if [ -n "${DEVICE}" -a -d "${PROJECT_DIR}/${PROJECT}/devices/${DEVICE}/filesyste
 fi
 
 # Run depmod for base overlay modules
-# 部署模块
+# Deploy modules
 MODVER=$(basename $(ls -d ${INSTALL}/usr/lib/kernel-overlays/base/lib/modules/*))
 find ${INSTALL}/usr/lib/kernel-overlays/base/lib/modules/${MODVER}/ -name *.ko | \
   sed -e "s,${INSTALL}/usr/lib/kernel-overlays/base/lib/modules/${MODVER}/,," \
@@ -282,37 +282,37 @@ find ${INSTALL}/usr/lib/kernel-overlays/base/lib/modules/${MODVER}/ -name *.ko |
 ${TOOLCHAIN}/bin/depmod -b ${INSTALL}/usr/lib/kernel-overlays/base -a -e -F "${BUILD}/linux-$(kernel_version)/System.map" ${MODVER} 2>&1
 
 # Strip kernel modules
-# 内核模块
+# Kernel modules
 for MOD in $(find ${INSTALL}/usr/lib/kernel-overlays/ -type f -name *.ko); do
   ${TARGET_KERNEL_PREFIX}strip --strip-debug ${MOD}
 done
 
 # Symlink overlayed modules to /usr/lib/modules
-# 链接模组
+# Link modules
 ln -sT /var/lib/modules ${INSTALL}/usr/lib/modules
 
 # Symlink overlayed firmware to /usr/lib/firmware
-# 链接固件
+# Link firmware
 ln -sT /var/lib/firmware ${INSTALL}/usr/lib/firmware
 
-# 用于检查脚本的第一个参数（${1}）是否为 system、mkimage 或 noobs 中的任意一个
+# Check whether the first script argument (${1}) is one of: system, mkimage, or noobs
 if [ "${1}" = "system" -o "${1}" = "mkimage" -o "${1}" = "noobs" ]
 then
   echo "Creating image..." >&2
 
   # Make target dir
-  # 创建项目文件夹
+  # Create the project folder
   mkdir -p ${TARGET_IMG}
   rm -rf ${TARGET_IMG}/${IMAGE_NAME}.kernel
 
   # Copy kernel to target dir
-  # 复制内核到项目文件夹
+  # Copy the kernel into the project folder
   cp -PR ${BUILD}/linux-$(kernel_version)/arch/${TARGET_KERNEL_ARCH}/boot/${KERNEL_TARGET} ${TARGET_IMG}/${IMAGE_NAME}.kernel
   chmod 0644 ${TARGET_IMG}/${IMAGE_NAME}.kernel
 
   # Set mksquashfs options for each compression method
-  # 设置squashfs文件系统的属性
-  # 根据指定的 SquashFS 压缩算法（SQUASHFS_COMPRESSION），自动设置对应的的压缩选项（SQUASHFS_COMPRESSION_OPTION）
+  # Set squashfs filesystem properties
+  # Pick the matching compression options (SQUASHFS_COMPRESSION_OPTION) for the selected SquashFS algorithm (SQUASHFS_COMPRESSION)
   if [ -z "${SQUASHFS_COMPRESSION_OPTION}" ]; then
     if [ "${SQUASHFS_COMPRESSION:-gzip}" = "gzip" ]; then
       SQUASHFS_COMPRESSION_OPTION="-Xcompression-level 9 -b 262144"
@@ -324,37 +324,37 @@ then
   fi
 
   # Create squashfs file, default to gzip if no compression configured
-  # 创建squashfs文件
+  # Create the squashfs file
   echo "rm -rf \"${TARGET_IMG}/${IMAGE_NAME}.system\"" >> ${FAKEROOT_SCRIPT}
   echo "${TOOLCHAIN}/bin/mksquashfs \"${BUILD}/image/system\" \"${TARGET_IMG}/${IMAGE_NAME}.system\" -noappend -comp ${SQUASHFS_COMPRESSION:-gzip} ${SQUASHFS_COMPRESSION_OPTION}" >> ${FAKEROOT_SCRIPT}
 
   # Run fakeroot
-  # 通过 fakeroot 模拟 root 权限执行权限修改命令
+  # Use fakeroot to run permission-changing commands under simulated root
   ${TOOLCHAIN}/bin/fakeroot -- ${FAKEROOT_SCRIPT}
   rm -rf ${FAKEROOT_SCRIPT}
 
   # Set permissions
-  # 设置权限
+  # Set permissions
   chmod 0644 ${TARGET_IMG}/${IMAGE_NAME}.system
 fi
 
-# 用于检查脚本的第一个参数（${1}）是否为 system、mkimage 或 noobs 中的任意一个
+# Check whether the first script argument (${1}) is one of: release, mkimage, or noobs
 if [ "${1}" = "release" -o "${1}" = "mkimage" -o "${1}" = "noobs" ]; then
 
-	# 设置发布文件夹
+	# Set the release folder
   RELEASE_DIR="target/${IMAGE_NAME}"
 
   # Cleanup
-  # 清理
+  # Cleanup
   rm -rf ${RELEASE_DIR}
 
   # Create release dir
-  # 创建文件夹
+  # Create the folder
   mkdir -p ${RELEASE_DIR}
   echo ${RELEASE_DIR}
 
   # Remove any previously created release images
-  # 移除任何之前创建的镜像
+  # Remove any previously created images
   rm -rf ${TARGET_IMG}/${IMAGE_NAME}.img.gz
   
   

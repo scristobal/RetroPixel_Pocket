@@ -16,8 +16,7 @@ mkdir -p $RELEASE_DIR/3rdparty/bootloader
   fi
  if [ -f $INSTALL/usr/share/bootloader/logo.bmp ]; then
  
-#    cp -a $INSTALL/usr/share/bootloader/logo.bmp $RELEASE_DIR/3rdparty/bootloader
-		cp -a /home/li/图片/logo-boot.bmp $RELEASE_DIR/3rdparty/bootloader/logo.bmp
+    cp -a $INSTALL/usr/share/bootloader/logo.bmp $RELEASE_DIR/3rdparty/bootloader
     cp -a $INSTALL/usr/share/bootloader/battery_0.bmp $RELEASE_DIR/3rdparty/bootloader
     cp -a $INSTALL/usr/share/bootloader/battery_1.bmp $RELEASE_DIR/3rdparty/bootloader
     cp -a $INSTALL/usr/share/bootloader/battery_2.bmp $RELEASE_DIR/3rdparty/bootloader

@@ -8,6 +8,7 @@ PKG_NAME="linux"
 PKG_VERSION="6095faa02fa1b245a83c30d7a4097f8f354ddc32"
 PKG_SITE="file://${OLDPWD}/extpackage/linux-kernel-rppocket"
 PKG_URL="${PKG_SITE}"
+PKG_TAR_COPY_OPTS="--exclude=.git --exclude=.svn --exclude=.libreelec-unpack --exclude=.libreelec-package"
 
 PKG_LICENSE="GPL"
 PKG_DEPENDS_HOST="ccache:host openssl:host"
@@ -16,6 +17,7 @@ PKG_DEPENDS_INIT="toolchain"
 PKG_NEED_UNPACK="${LINUX_DEPENDS} $(get_pkg_directory busybox)"
 PKG_LONGDESC="This package contains the kernel for the RG351P/M/V/MP and RG552"
 PKG_IS_KERNEL_PKG="yes"
+PKG_TOOLCHAIN="manual"
 PKG_STAMP="${KERNEL_TARGET} ${KERNEL_MAKE_EXTRACMD}"
 
 if [[ "${DEVICE}" == RG351V ]]; then
@@ -47,8 +49,18 @@ if [[ "${KERNEL_TARGET}" = uImage* ]]; then
   PKG_DEPENDS_TARGET="${PKG_DEPENDS_TARGET} u-boot-tools:host"
 fi
 
+patch_unifdef_host() {
+  if [ -f "${PKG_BUILD}/scripts/unifdef.c" ]; then
+    # GCC 15 treats constexpr as a C23 keyword, but this older kernel uses it
+    # as a local variable name in the host unifdef helper.
+    sed -i -e 's/\<constexpr\>/constexpr_val/g' "${PKG_BUILD}/scripts/unifdef.c"
+  fi
+}
+
 post_patch() {
   cp ${PKG_KERNEL_CFG_FILE} ${PKG_BUILD}/.config
+
+  patch_unifdef_host
 
   sed -i -e "s|^CONFIG_INITRAMFS_SOURCE=.*$|CONFIG_INITRAMFS_SOURCE=\"${BUILD}/image/initramfs.cpio\"|" ${PKG_BUILD}/.config
   sed -i -e '/^CONFIG_INITRAMFS_SOURCE=*./ a CONFIG_INITRAMFS_ROOT_UID=0\nCONFIG_INITRAMFS_ROOT_GID=0' ${PKG_BUILD}/.config
@@ -92,22 +104,28 @@ post_patch() {
 }
 
 make_host() {
+  patch_unifdef_host
+
   make \
     ARCH=${HEADERS_ARCH:-${TARGET_KERNEL_ARCH}} \
     HOSTCC="${TOOLCHAIN}/bin/host-gcc" \
     HOSTCXX="${TOOLCHAIN}/bin/host-g++" \
-    HOSTCFLAGS="${HOST_CFLAGS}" \
+    HOSTCFLAGS="${HOST_CFLAGS} -std=gnu17" \
+    KBUILD_HOSTCFLAGS="${HOST_CFLAGS} -std=gnu17" \
     HOSTCXXFLAGS="${HOST_CXXFLAGS}" \
     HOSTLDFLAGS="${HOST_LDFLAGS}" \
     headers_check
 }
 
 makeinstall_host() {
+  patch_unifdef_host
+
   make \
     ARCH=${HEADERS_ARCH:-${TARGET_KERNEL_ARCH}} \
     HOSTCC="${TOOLCHAIN}/bin/host-gcc" \
     HOSTCXX="${TOOLCHAIN}/bin/host-g++" \
-    HOSTCFLAGS="${HOST_CFLAGS}" \
+    HOSTCFLAGS="${HOST_CFLAGS} -std=gnu17" \
+    KBUILD_HOSTCFLAGS="${HOST_CFLAGS} -std=gnu17" \
     HOSTCXXFLAGS="${HOST_CXXFLAGS}" \
     HOSTLDFLAGS="${HOST_LDFLAGS}" \
     INSTALL_HDR_PATH=dest \

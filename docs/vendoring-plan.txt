@@ -1,0 +1,114 @@
+RetroPixel source vendoring plan
+================================
+
+Goal
+----
+
+Make a clone of this repository contain every source artifact needed to build
+the RPPOCKET image, while preserving upstream provenance for each dependency.
+The build should be able to run in an offline mode where any missing vendored
+source is a hard error, not an implicit network download.
+
+Current build model
+-------------------
+
+The build system already separates metadata and source cache:
+
+- packages/*/package.mk declares PKG_SITE, PKG_URL, PKG_VERSION, PKG_SHA256,
+  and git branch/submodule options where applicable.
+- sources/<package>/ stores downloaded archives or checked-out source trees.
+- extpackage/ stores local source trees used by several emulator packages.
+- scripts/get chooses a handler from PKG_URL:
+  - archive: downloads to sources/<package>/<PKG_SOURCE_NAME>
+  - git: clones to sources/<package>/<package>-<PKG_VERSION>
+  - file: uses a local file:// source
+
+Recommended repository layout
+-----------------------------
+
+Keep the existing layout and make it official:
+
+- sources/ is the vendored third-party source cache.
+- extpackage/ remains vendored local source trees for packages already using it.
+- docs/vendor-manifest.tsv records provenance and local cache status.
+- Optional later: use Git LFS for large archives and source blobs.
+
+Do not replace every PKG_URL with file:// paths. Keeping the original URL in
+package.mk is valuable provenance. The build logic should prefer vendored files
+when offline mode is enabled and only use PKG_URL when explicitly allowed.
+
+Implementation steps
+--------------------
+
+1. Generate a manifest for the configured target:
+
+   DISTRO=RetroPixel PROJECT=Rockchip DEVICE=RPPOCKET ARCH=aarch64 \
+     scripts/vendor_manifest > docs/vendor-manifest.tsv
+
+2. Fill every missing source listed in the manifest.
+
+   For archives, the expected path is:
+
+   sources/<package>/<PKG_SOURCE_NAME>
+
+   For git packages, the expected path is:
+
+   sources/<package>/<package>-<PKG_VERSION>
+
+   For file:// packages, the expected path is the local path referenced by
+   PKG_SOURCE_NAME, usually under extpackage/.
+
+3. Record exact provenance.
+
+   The manifest should be committed with:
+
+   - package name
+   - version or commit
+   - source URL
+   - site URL
+   - declared sha256, if any
+   - local sha256 for archives, if present
+   - local source path
+   - present/missing status
+
+4. Add an offline source mode.
+
+   Add a build flag such as VENDORED_SOURCES_ONLY=yes. In this mode:
+
+   - scripts/get_archive must fail if sources/<package>/<PKG_SOURCE_NAME> is
+     missing or has a mismatched checksum.
+   - scripts/get_git must fail if sources/<package>/<package>-<PKG_VERSION> is
+     missing, at the wrong commit, or has missing submodules.
+   - scripts/get_file must fail if the local file:// source does not exist.
+   - no wget, git clone, git pull, or git submodule network operation should run.
+
+5. Decide Git LFS policy after measuring the vendored set.
+
+   Likely LFS candidates:
+
+   - sources/**/*.tar
+   - sources/**/*.tar.gz
+   - sources/**/*.tar.xz
+   - sources/**/*.tar.bz2
+   - sources/**/*.tgz
+   - sources/**/*.zip
+   - sources/**/*.7z
+   - extpackage/** for large checked-out source trees
+
+   Git LFS is useful for clone size, but it adds its own dependency. If the
+   requirement is "plain git clone with no extra fetch", then plain Git blobs
+   are more self-contained than LFS. If the requirement is "GitHub/GitLab clone
+   may use LFS", then LFS is appropriate for the large artifacts.
+
+Validation
+----------
+
+After vendoring is complete:
+
+1. Move the existing build and source cache aside, or test in a fresh clone.
+2. Disable network.
+3. Build with:
+
+   VENDORED_SOURCES_ONLY=yes make RPPOCKET
+
+4. Any network access or missing source should be treated as a bug.

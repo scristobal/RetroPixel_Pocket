@@ -22,11 +22,11 @@ PKG_NEED_UNPACK="busybox"
 PKG_LONGDESC="Emulationstation emulator frontend"
 PKG_BUILD_FLAGS="+lto-parallel"
 
-#PKG_SITE="file:///home/li/RK3326/AmberELEC/sources/emulationstation/emulationstation-04aae4dc49622b0d21754c6f28cdb498d55f559c"
+#PKG_SITE="file://${HOME}/RK3326/AmberELEC/sources/emulationstation/emulationstation-04aae4dc49622b0d21754c6f28cdb498d55f559c"
 #PKG_URL="${PKG_SITE}"
-#PKG_SITE="file:///home/li/RK3326/AmberELEC/sources/emulationstation/emulationstation-5d0e295a05ee2b83e4aa741a2b275aa0b5c79f18"
+#PKG_SITE="file://${HOME}/RK3326/AmberELEC/sources/emulationstation/emulationstation-5d0e295a05ee2b83e4aa741a2b275aa0b5c79f18"
 #PKG_URL="${PKG_SITE}"
-#PKG_SITE="file:///home/li/RK3326/AmberELEC/sources/emulationstation/emulationstation-4111537f3d69f22016f23ae40d12a346c822d7d6"
+#PKG_SITE="file://${HOME}/RK3326/AmberELEC/sources/emulationstation/emulationstation-4111537f3d69f22016f23ae40d12a346c822d7d6"
 #PKG_URL="${PKG_SITE}"
 ##########################################################################################################
 # Uncomment the following lines (PKG_SITE, PKG_URL) to build locally from a git clone

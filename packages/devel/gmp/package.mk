@@ -17,4 +17,5 @@ PKG_CONFIGURE_OPTS_HOST="--enable-cxx --enable-static --disable-shared"
 
 pre_configure_host() {
   export CPPFLAGS="${CPPFLAGS} -fexceptions"
+  export CFLAGS="${CFLAGS} -std=gnu17"
 }

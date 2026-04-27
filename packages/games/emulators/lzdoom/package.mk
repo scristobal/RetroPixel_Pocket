@@ -33,18 +33,20 @@ makeinstall_host() {
 }
 
 pre_configure_host(){
-PKG_CMAKE_OPTS_HOST=" -DCMAKE_BUILD_TYPE=Release \
-                      -DCMAKE_RULE_MESSAGES=OFF \
-                      -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON"
+  export CFLAGS="${CFLAGS} -std=gnu17"
+  PKG_CMAKE_OPTS_HOST=" -DCMAKE_BUILD_TYPE=Release \
+                        -DCMAKE_RULE_MESSAGES=OFF \
+                        -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON"
 }
 
 pre_configure_target() {
-PKG_CMAKE_OPTS_TARGET=" -DNO_GTK=ON \
-                        -DFORCE_CROSSCOMPILE=ON \
-                        -DIMPORT_EXECUTABLES=${PKG_BUILD}/.${HOST_NAME}/ImportExecutables.cmake \
-                        -DCMAKE_BUILD_TYPE=Release \
-                        -DCMAKE_RULE_MESSAGES=OFF \
-                        -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON"
+  export CFLAGS="${CFLAGS} -std=gnu17"
+  PKG_CMAKE_OPTS_TARGET=" -DNO_GTK=ON \
+                          -DFORCE_CROSSCOMPILE=ON \
+                          -DIMPORT_EXECUTABLES=${PKG_BUILD}/.${HOST_NAME}/ImportExecutables.cmake \
+                          -DCMAKE_BUILD_TYPE=Release \
+                          -DCMAKE_RULE_MESSAGES=OFF \
+                          -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON"
 }
 
 makeinstall_target() {

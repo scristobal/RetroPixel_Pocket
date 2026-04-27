@@ -13,6 +13,16 @@ PKG_NEED_UNPACK="$(get_pkg_directory zlib) $(get_pkg_directory lzo) $(get_pkg_di
 PKG_LONGDESC="Tools for squashfs, a highly compressed read-only filesystem for Linux."
 PKG_TOOLCHAIN="manual"
 
+post_patch() {
+  sed -i \
+    -e 's/^void sighandler()$/void sighandler(int sig)/' \
+    -e 's/^static void sigalrm_handler()$/static void sigalrm_handler(int sig)/' \
+    -e 's/^static void sigwinch_handler()$/static void sigwinch_handler(int sig)/' \
+    ${PKG_BUILD}/squashfs-tools/mksquashfs.c \
+    ${PKG_BUILD}/squashfs-tools/reader.c \
+    ${PKG_BUILD}/squashfs-tools/progressbar.c
+}
+
 make_host() {
   make -C squashfs-tools \
           mksquashfs \

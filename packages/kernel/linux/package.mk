@@ -13,7 +13,7 @@ PKG_NEED_UNPACK="${LINUX_DEPENDS} $(get_pkg_directory busybox) ${PROJECT_DIR}/${
 PKG_LONGDESC="This package contains a precompiled kernel image and the modules."
 PKG_IS_KERNEL_PKG="yes"
 PKG_STAMP="${KERNEL_TARGET} ${KERNEL_MAKE_EXTRACMD} ${KERNEL_UBOOT_EXTRA_TARGET}"
-REEDIT_KERNEL_DIR="/home/li/RK3326/linux-6095faa02fa1b245a83c30d7a4097f8f354ddc32"
+REEDIT_KERNEL_DIR="${HOME}/RK3326/linux-6095faa02fa1b245a83c30d7a4097f8f354ddc32"
 
 PKG_VERSION="5.10.10"
 #PKG_SHA256=""
@@ -46,6 +46,10 @@ fi
 
 post_patch() {
   cp ${PKG_KERNEL_CFG_FILE} ${PKG_BUILD}/.config
+
+  # GCC 15 treats constexpr as a C23 keyword, but this older kernel uses it as
+  # a local variable name in the host unifdef helper.
+  sed -i -e 's/\bconstexpr\b/constexpr_val/g' ${PKG_BUILD}/scripts/unifdef.c
 
   # set default hostname based on ${DISTRONAME}
     sed -i -e "s|@DISTRONAME@|${DISTRONAME}|g" ${PKG_BUILD}/.config
@@ -86,22 +90,28 @@ post_patch() {
 }
 
 make_host() {
+  sed -i -e 's/constexpr/constexpr_val/g' ${PKG_BUILD}/scripts/unifdef.c
+
   make \
     ARCH=${HEADERS_ARCH:-${TARGET_KERNEL_ARCH}} \
     HOSTCC="${TOOLCHAIN}/bin/host-gcc" \
     HOSTCXX="${TOOLCHAIN}/bin/host-g++" \
-    HOSTCFLAGS="${HOST_CFLAGS}" \
+    HOSTCFLAGS="${HOST_CFLAGS} -std=gnu17" \
+    KBUILD_HOSTCFLAGS="${HOST_CFLAGS} -std=gnu17" \
     HOSTCXXFLAGS="${HOST_CXXFLAGS}" \
     HOSTLDFLAGS="${HOST_LDFLAGS}" \
     headers_check
 }
 
 makeinstall_host() {
+  sed -i -e 's/constexpr/constexpr_val/g' ${PKG_BUILD}/scripts/unifdef.c
+
   make \
     ARCH=${HEADERS_ARCH:-${TARGET_KERNEL_ARCH}} \
     HOSTCC="${TOOLCHAIN}/bin/host-gcc" \
     HOSTCXX="${TOOLCHAIN}/bin/host-g++" \
-    HOSTCFLAGS="${HOST_CFLAGS}" \
+    HOSTCFLAGS="${HOST_CFLAGS} -std=gnu17" \
+    KBUILD_HOSTCFLAGS="${HOST_CFLAGS} -std=gnu17" \
     HOSTCXXFLAGS="${HOST_CXXFLAGS}" \
     HOSTLDFLAGS="${HOST_LDFLAGS}" \
     INSTALL_HDR_PATH=dest \

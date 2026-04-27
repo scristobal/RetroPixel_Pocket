@@ -31,7 +31,7 @@ makeinstall_target() {
 }
 
 makeinstall_init() {
-	echo "执行到makeinstall_init"
+	echo "Reached makeinstall_init"
   mkdir -p ${INSTALL}/usr/bin
   cp ply-image ${INSTALL}/usr/bin
 
@@ -39,5 +39,5 @@ makeinstall_init() {
   find_file_path "splash/splash-480.png" && cp ${FOUND_PATH} ${INSTALL}/splash
   find_file_path "splash/splash-640.png" && cp ${FOUND_PATH} ${INSTALL}/splash
   find_file_path "splash/splash-1920.png" && cp ${FOUND_PATH} ${INSTALL}/splash
-  echo "makeinstall_init执行完毕"
+  echo "makeinstall_init finished"
 }

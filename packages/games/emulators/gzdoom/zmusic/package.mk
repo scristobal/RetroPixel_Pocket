@@ -18,14 +18,14 @@ pre_build_host() {
 }
 
 make_host() {
-  mkdir ${PKG_BUILD}/build_host
+  mkdir -p ${PKG_BUILD}/build_host
   cd ${PKG_BUILD}/build_host
   cmake -DCMAKE_BUILD_TYPE=Release ..
   cmake --build .
 }
 
 make_target() {
-  mkdir ${PKG_BUILD}/build_target
+  mkdir -p ${PKG_BUILD}/build_target
   cd ${PKG_BUILD}/build_target
   cmake -DCMAKE_BUILD_TYPE=Release ..
   cmake --build .

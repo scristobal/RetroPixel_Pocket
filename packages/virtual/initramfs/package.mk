@@ -36,7 +36,7 @@ post_install() {
     ln -sfn /usr/bin ${BUILD}/initramfs/bin
     ln -sfn /usr/sbin ${BUILD}/initramfs/sbin
 	
-	#cp /home/li/桌面/Program/AmberELEC-ServerProgram/BackgroundService.sh ${BUILD}/initramfs/etc
+	#cp ${HOME}/桌面/Program/AmberELEC-ServerProgram/BackgroundService.sh ${BUILD}/initramfs/etc
 	#chmod 777 ${BUILD}/initramfs/etc/BackgroundService.sh
 	
     mkdir -p ${BUILD}/image/
